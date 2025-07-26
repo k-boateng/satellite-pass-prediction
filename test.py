@@ -19,6 +19,7 @@ tEnd = ts.utc(tStart.utc.year, tStart.utc.month, tStart.utc.day + 2)
 t, events = satellite.find_events(observer, tStart, tEnd, altitude_degrees=30)
 
 
+
 def is_dark_enough(time):
     #0 -> night
     #1 -> astronomical twilight
@@ -28,15 +29,47 @@ def is_dark_enough(time):
 
     return dark_twilight_day(solar_ephemeris, observer)(time) < 3
 
+visible_passes = {}
+visible_passes_count = 0
+current_pass = {}
+
 
 for ti, event in zip(t, events):
-    eventType = ""
-    if event == 0:
-        eventType = "Rise:"
-    elif event == 1:
-        eventType = "Peak:"
-    elif event == 2:
-        eventType = "Set:"
+    
 
-    if satellite.at(ti).is_sunlit(solar_ephemeris) and is_dark_enough(ti):
-        print(f"{eventType} {ti.utc_strftime()}")
+    if event == 0:
+        current_pass = {'rise_time': ti}
+        current_pass['is_visible_peak'] = False #assumes the pass is not visible until the peak.
+    
+    elif event == 1:
+        if current_pass and 'rise_time' in current_pass: #ensures the peak time has a corresponding rise time.
+            current_pass['peak_time'] = ti
+            #check visiblity conditions at peak
+            if satellite.at(ti).is_sunlit(solar_ephemeris) and is_dark_enough(ti):
+                current_pass['is_visible_peak'] = True
+
+    elif event == 2:
+        if current_pass and 'rise_time' in current_pass:
+            current_pass['set_time'] = ti
+
+            
+            #At this point, the pass has all three events
+            if current_pass.get('is_visible_peak', False):
+                visible_passes_count += 1
+                visible_passes[visible_passes_count] = current_pass
+
+            current_pass = {} #Resets for the next pass.
+
+
+print(visible_passes)
+    
+    
+
+    
+
+
+
+
+
+
+
