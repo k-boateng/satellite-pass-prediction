@@ -2,12 +2,12 @@ from skyfield.api import load,wgs84
 from skyfield.almanac import dark_twilight_day
 
 ts = load.timescale()
-satellites = load.tle_file("https://celestrak.org/NORAD/elements/visual.txt")
+satellites = load.tle_file("http://www.celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle") #All active satellites
 
 
 #Testing using SL-16 R/B
 by_name = {sat.name: sat for sat in satellites}
-satellite = by_name['SL-16 R/B']
+satellite = by_name['ISS (ZARYA)']
 observer = wgs84.latlon(42.3583,-71.0603)
 solar_ephemeris = load('de421.bsp') #loads ephemeris for twilight data
 
@@ -16,7 +16,7 @@ solar_ephemeris = load('de421.bsp') #loads ephemeris for twilight data
 tStart = ts.now()
 tEnd = ts.utc(tStart.utc.year, tStart.utc.month, tStart.utc.day + 2)
 
-t, events = satellite.find_events(observer, tStart, tEnd, altitude_degrees=30)
+t, events = satellite.find_events(observer, tStart, tEnd, altitude_degrees=30) #higher altitude -> more visible
 
 
 
