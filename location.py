@@ -8,10 +8,10 @@ def get_observer_location():
         loc = data.get("loc", "")  #(latitude,longitude)
         if loc:
             splitLoc = loc.split(",")
-            lat = float(splitLoc[0]) #latitude
-            lon = float(splitLoc[1]) #longitude
+            lat = float(splitLoc[0])
+            lon = float(splitLoc[1]) 
             print(f"Your location: {lat:.4f}, {lon:.4f}")
-            return lat, lon, 0  # Default elevation which is 0m
+            return lat, lon, 0 
     except Exception as e:
         print(f"IP location lookup failed: {e}")
 
